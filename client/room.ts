@@ -7,6 +7,7 @@ import Page from './page';
 import Select from './select';
 
 import roomHtml from './html/room.html';
+import roomCss from './css/room.css';
 
 export default class Room implements Page {
     private router: Router;
@@ -61,6 +62,10 @@ export default class Room implements Page {
         });
 
         this.socket.emit('updateInfo', this.roomId);
+    }
+
+    public setStylesheet(): void {
+        $('#pageStyle').html(roomCss.toString());
     }
 
     public leaveRoom(): void {

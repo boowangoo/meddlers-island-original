@@ -1,0 +1,18 @@
+#gameBoard {
+    grid-area: board;
+}
+
+#gameLog {
+    grid-area: log;
+}
+
+#gamePlayerInfo {
+    grid-area: info;
+}
+
+#gameGridHolder {
+    display: grid;
+    grid-template-areas:
+        "board info"
+        "log info"
+}

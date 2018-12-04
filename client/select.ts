@@ -6,6 +6,7 @@ import Room from './room'
 import { RoomData, ID, Html } from '../types';
 
 import selectHtml from './html/select.html';
+import selectCss from './css/select.css';
 import Page from './page';
 
 export default class Select implements Page {
@@ -49,6 +50,10 @@ export default class Select implements Page {
                 data.map((d: RoomData) => { this.updateInfo(d); });
             });
         });
+    }
+
+    public setStylesheet(): void {
+        $('#pageStyle').html(selectCss.toString());
     }
 
     private appendRow(rowId: ID, data: RoomData): void {

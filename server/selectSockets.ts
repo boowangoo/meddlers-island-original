@@ -68,7 +68,7 @@ export default class SelectSockets {
     private createRoom(roomId: ID, conn: SocketConnection): RoomInfo {
         let room: RoomInfo = null;
         if (!conn.db.roomMap.has(roomId)) {
-            room = new RoomInfo(roomId); 
+            room = new RoomInfo(roomId, 4); 
             conn.db.roomMap.set(roomId, room);
         }
         return room;

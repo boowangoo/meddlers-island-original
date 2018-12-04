@@ -26,7 +26,11 @@ module.exports = {
         test: /\.html$/,
         use: 'html-loader',
         exclude: /node_modules/
-        // options: { minimize: true }
+      },
+      {
+        test: /\.css$/,
+        use: 'css-loader',
+        exclude: /node_modules/
       }
     ]
   },

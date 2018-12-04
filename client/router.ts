@@ -9,5 +9,6 @@ export default class Router {
         this.currPage = page;
         $('#container').html(page.HTML());
         page.init();
+        page.setStylesheet();
     }
 }
