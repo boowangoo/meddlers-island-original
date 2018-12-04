@@ -1,0 +1,45 @@
+{
+  "name": "peddlers-of-japan",
+  "version": "1.0.0",
+  "description": "a knockoff of settlers of catan",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist && webpack --config webpack.server.config.js && webpack --config webpack.client.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run build && node dist/server/server.bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boowangoo/peddlers-of-japan.git"
+  },
+  "author": "boowangoo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/boowangoo/peddlers-of-japan/issues"
+  },
+  "homepage": "https://github.com/boowangoo/peddlers-of-japan/#readme",
+  "devDependencies": {
+    "@types/webpack": "^4.4.17",
+    "@types/webpack-env": "^1.13.6",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "source-map-support": "^0.5.9",
+    "ts-loader": "^5.2.2",
+    "typescript": "^3.1.3",
+    "webpack": "^4.22.0",
+    "webpack-cli": "^3.1.2",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "@types/express": "^4.16.0",
+    "@types/jquery": "^3.3.22",
+    "@types/node": "^10.12.0",
+    "@types/socket.io": "^2.1.0",
+    "@types/socket.io-client": "^1.4.32",
+    "express": "^4.16.4",
+    "file-loader": "^2.0.0",
+    "jquery": "^3.3.1",
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1"
+  }
+}
