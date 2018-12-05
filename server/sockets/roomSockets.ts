@@ -1,14 +1,16 @@
 import socketIO from 'socket.io'
-import { ID, RoomData } from '../types';
-import RoomDB from './roomDB';
+import { ID, RoomData } from '../../types';
+import RoomDB from '../room/roomDB';
 import SelectSockets from './selectSockets';
-import RoomInfo from './roomInfo';
-import { SocketConnection } from './socketSetup';
+import RoomInfo from '../room/roomInfo';
+import { SocketConnection } from '../socketSetup';
 
 export default class RoomSockets {
+    private conn: SocketConnection;
     private roomNsp: socketIO.Namespace;
 
     constructor(nsp: socketIO.Namespace, conn: SocketConnection) {
+        this.conn = conn;
         this.roomNsp = nsp;
 
         this.roomNsp.on('connection', (socket: socketIO.Socket) => {
@@ -20,25 +22,24 @@ export default class RoomSockets {
             socket.on('leaveRoom', (roomId: ID) => {
                 socket.leave(roomId, (err: any) => {
                     if (!err) {
-                        this.leaveRoom(
-                                roomId, conn, socket.id.replace(/\/.+#/, ''));
+                        this.leaveRoom(roomId, socket.id.replace(/\/.+#/, ''));
                     }
                 });
             });
 
             socket.on('updateInfo', (roomId: ID) => {
-                this.updateInfo(roomId, conn);
+                this.updateInfo(roomId);
             });
 
-            socket.on('wave', (roomId: ID) => {
-                this.roomNsp.in(roomId).emit('updateWave', socket.id);
+            socket.on('startGame', (roomId: ID) => {
+                this.roomNsp.in(roomId).emit('startGame');
             });
 
             socket.on('disconnect', () => {
                 conn.db.roomMap.forEach((val: RoomInfo, key: string) => {
                     const playerId = socket.id.replace(/\/.+#/, '');
                     if (val.players.indexOf(playerId) > -1) {
-                        this.leaveRoom(key, conn, playerId);
+                        this.leaveRoom(key, playerId);
                     }
                 });
             });
@@ -49,22 +50,31 @@ export default class RoomSockets {
         this.roomNsp.in(roomId).emit('kicked');
     }
 
-    private leaveRoom(roomId: ID, conn: SocketConnection, playerId: ID): RoomData {
+    private leaveRoom(roomId: ID, playerId: ID): RoomData {
         let roomInfo: RoomInfo = null;
-        if (conn.db.roomMap.has(roomId)) {
-            roomInfo = conn.db.roomMap.get(roomId).decrPlayers(playerId);
+        let data: RoomData = null;
+        if (this.conn.db.roomMap.has(roomId)) {
+            roomInfo = this.conn.db.roomMap.get(roomId).decrPlayers(playerId);
         }
         if (roomInfo) {
-            this.updateInfo(roomId, conn);
-            conn.selectSockets.updateInfo(roomInfo.toMsg());
+            data = roomInfo.toMsg();
+            if (roomInfo.players.length <= 0) {
+                if (this.conn.db.roomMap.has(roomId)) {
+                    this.conn.db.roomMap.delete(roomId);
+                }
+                this.conn.selectSockets.deleteInfo(data);
+            } else {
+                this.updateInfo(roomId);
+                this.conn.selectSockets.updateInfo(data);
+            }
         }
-        return roomInfo ? roomInfo.toMsg() : null;
+        return data;
     }
 
-    private updateInfo(roomId: ID, conn: SocketConnection) {
+    private updateInfo(roomId: ID) {
         let data: RoomData = null;
-        if (conn.db.roomMap.has(roomId)) {
-            data = conn.db.roomMap.get(roomId).toMsg();
+        if (this.conn.db.roomMap.has(roomId)) {
+            data = this.conn.db.roomMap.get(roomId).toMsg();
         }
         this.roomNsp.in(roomId).emit('updateInfo', data);
     }

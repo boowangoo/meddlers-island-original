@@ -1,14 +1,28 @@
 import $ from 'jquery';
 
 import Router from './router'; 
-import Select from './select';
+import Select from './pages/select';
 
 import globalCss from './css/global.css';
-import Game from './game';
+import Game from './pages/game';
+import Room from './pages/room';
 
-$('#globalStyle').html(globalCss.toString());
+export default class Index {
+    public router: Router;
 
-const router = new Router();
-const select = new Select(router);
-// router.changePage(select);
-router.changePage(new Game());
+    public select: Select;
+    public room: Room;
+    public game: Game;
+
+    constructor() {
+        this.router = new Router();
+        this.select = new Select(this);
+        this.room = new Room(this);
+        this.game = new Game(this);
+
+        $('#globalStyle').html(globalCss.toString());
+        this.router.changePage(this.select);
+    }
+}
+
+new Index();

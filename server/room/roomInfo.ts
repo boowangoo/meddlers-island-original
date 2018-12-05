@@ -1,4 +1,4 @@
-import { RoomData, ID } from "../types";
+import { RoomData, ID } from "../../types";
 
 export default class RoomInfo {
     private _roomId: ID;

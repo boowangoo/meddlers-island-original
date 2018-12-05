@@ -1,21 +1,23 @@
 import socketIO from 'socket.io'
-import RoomInfo from './roomInfo';
-import { ID, RoomData } from '../types';
-import RoomDB from './roomDB';
-import Room from '../client/room';
-import { SocketConnection } from './socketSetup';
+import RoomInfo from '../room/roomInfo';
+import { ID, RoomData } from '../../types';
+import RoomDB from '../room/roomDB';
+import Room from '../../client/pages/room';
+import { SocketConnection } from '../socketSetup';
 
 export default class SelectSockets {
+    private conn: SocketConnection;
     private selectNsp: socketIO.Namespace;
 
     constructor(nsp: socketIO.Namespace, conn: SocketConnection) {
+        this.conn = conn;
         this.selectNsp = nsp;
 
         this.selectNsp.on('connection', (socket: socketIO.Socket) => {
             socket.on('createRoom', (roomId: ID, callback: Function) => {
                 let data: RoomData = null;
                 if (!conn.db.roomMap.has(roomId)) {
-                    const room = this.createRoom(roomId, conn);
+                    const room = this.createRoom(roomId);
                     if (room) {
                         console.log(`room ${ roomId } created`);
                         data = room.toMsg();
@@ -60,16 +62,16 @@ export default class SelectSockets {
     public updateInfo(data: RoomData) {
         this.selectNsp.emit('updateInfo', data);
     }
-
+    
     public deleteInfo(data: RoomData) {
         this.selectNsp.emit('deleteInfo', data);
     }
 
-    private createRoom(roomId: ID, conn: SocketConnection): RoomInfo {
+    private createRoom(roomId: ID): RoomInfo {
         let room: RoomInfo = null;
-        if (!conn.db.roomMap.has(roomId)) {
+        if (!this.conn.db.roomMap.has(roomId)) {
             room = new RoomInfo(roomId, 4); 
-            conn.db.roomMap.set(roomId, room);
+            this.conn.db.roomMap.set(roomId, room);
         }
         return room;
     }

@@ -8,7 +8,7 @@ export default class Router {
     public changePage(page: Page): void {
         this.currPage = page;
         $('#container').html(page.HTML());
-        page.init();
         page.setStylesheet();
+        page.init();
     }
 }

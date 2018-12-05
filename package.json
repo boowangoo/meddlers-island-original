@@ -37,10 +37,12 @@
     "@types/node": "^10.12.0",
     "@types/socket.io": "^2.1.0",
     "@types/socket.io-client": "^1.4.32",
+    "@types/svg.js": "^2.3.1",
     "express": "^4.16.4",
     "file-loader": "^2.0.0",
     "jquery": "^3.3.1",
     "socket.io": "^2.1.1",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^2.1.1",
+    "svg.js": "^2.7.1"
   }
 }

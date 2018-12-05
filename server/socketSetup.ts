@@ -1,8 +1,8 @@
 import socketIO from 'socket.io'
-import RoomInfo from './roomInfo';
-import SelectSockets from './selectSockets';
-import RoomSockets from './roomSockets';
-import RoomDB from './roomDB';
+import RoomInfo from './room/roomInfo';
+import SelectSockets from './sockets/selectSockets';
+import RoomSockets from './sockets/roomSockets';
+import RoomDB from './room/roomDB';
 
 export class SocketConnection {
     public db: RoomDB;

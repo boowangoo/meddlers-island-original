@@ -1,32 +1,34 @@
 import $ from 'jquery';
 import io from 'socket.io-client';
 
-import Router from './router';
-import { Html, RoomData, ID }  from '../types';
-import Page from './page';
-import Select from './select';
+import { Html, RoomData, ID }  from '../../types';
+import Index from '../index';
+import Page from '../page';
 
-import roomHtml from './html/room.html';
-import roomCss from './css/room.css';
+import roomHtml from '../html/room.html';
+import roomCss from '../css/room.css';
 
 export default class Room implements Page {
-    private router: Router;
+    private index: Index;
     private socket: SocketIOClient.Socket;
 
     private _roomId: ID;
     private _players: number;
     private _capacity: number;
 
-    private selectPage: Select;
+    constructor(index: Index) {
+        this._roomId = null;
+        this._players = null;
+        this._capacity = null;
 
-    constructor(roomId: ID, players: number, capacity: number, selectPage: Select, router: Router) {
-        this._roomId = roomId;
-        this._players = players;
-        this._capacity = capacity;
-
+        this.index = index;
         this.socket = io('/room');
-        this.router = router;
-        this.selectPage = selectPage;
+    }
+
+    public setData(data: RoomData) {
+        this._roomId = data.roomId;
+        this._players = data.players;
+        this._capacity = data.capacity;
     }
 
     public init(): void {
@@ -34,11 +36,15 @@ export default class Room implements Page {
 
         $(document).ready(() => {
             $('#leaveRoom').click(() => {
-                this.leaveRoom();
+                this.leaveRoom(this.index.select);
             });
             
-            $('#wave').click(() => {
-                this.socket.emit('wave', this.roomId);
+            $('#startGame').click(() => {
+                if (this.players < 3) {
+                    $('#startGameMsgBox').html('cannot start game: need 3+ players');
+                } else {
+                    this.socket.emit('startGame', this.roomId);
+                }
             });
         });
 
@@ -54,11 +60,11 @@ export default class Room implements Page {
         });
 
         this.socket.on('kicked', () => {
-            this.delete();
+            this.delete(this.index.select);
         });
         
-        this.socket.on('updateWave', (playerID: ID) => {
-            $('#waveMsgBox').html(playerID + ' waved!');
+        this.socket.on('startGame', () => {
+            this.leaveRoom(this.index.game);
         });
 
         this.socket.emit('updateInfo', this.roomId);
@@ -68,13 +74,13 @@ export default class Room implements Page {
         $('#pageStyle').html(roomCss.toString());
     }
 
-    public leaveRoom(): void {
+    public leaveRoom(page: Page): void {
         this.socket.emit('leaveRoom', this.roomId);
-        this.delete();
+        this.delete(page);
     }
 
-    public delete(): void {
-        this.router.changePage(this.selectPage);
+    public delete(page: Page): void {
+        this.index.router.changePage(page);
     }
 
     public get roomId(): ID { return this._roomId; }

@@ -1,23 +1,22 @@
 import $ from 'jquery';
 import io from 'socket.io-client';
 
-import Router from './router';
-import Room from './room'
-import { RoomData, ID, Html } from '../types';
+import { RoomData, ID, Html } from '../../types';
 
-import selectHtml from './html/select.html';
-import selectCss from './css/select.css';
-import Page from './page';
+import selectHtml from '../html/select.html';
+import selectCss from '../css/select.css';
+import Page from '../page';
+import Index from '../index';
 
 export default class Select implements Page {
+    private index: Index;
     private socket: SocketIOClient.Socket;
-    private router: Router;
-    private roomMap: Map<ID, Room>;
+    private roomIdSet: Set<ID>;
 
-    constructor(router: Router) {
+    constructor(index: Index) {
+        this.index = index;
         this.socket = io('/select');
-        this.router = router;
-        this.roomMap = new Map<ID, Room>();
+        this.roomIdSet = new Set<ID>();
     }
 
     public init(): void {
@@ -77,9 +76,9 @@ export default class Select implements Page {
 
     private joinRoom(roomId: ID): void {
         this.socket.emit('joinRoom', roomId, (data: RoomData) => {
-            if (data) {
-                const room: Room = this.roomMap.get(roomId);
-                this.router.changePage(room);
+            if (data && this.roomIdSet.has(data.roomId)) {
+                this.index.room.setData(data);
+                this.index.router.changePage(this.index.room);
             }
         });
     }
@@ -93,7 +92,9 @@ export default class Select implements Page {
         if ($(`#${rowId}`).length) { // if the row exists in the DOM
             $(`#${rowId}`).remove();
         }
-        this.roomMap.delete(data.roomId);
+        if (this.roomIdSet.has(data.roomId)) {
+            this.roomIdSet.delete(data.roomId);
+        }
     }
 
     private updateInfo(data: RoomData): void {
@@ -103,15 +104,11 @@ export default class Select implements Page {
             this.appendRow(rowId, data);
         }
 
-        if (this.roomMap.has(data.roomId)) {
-            const room = this.roomMap.get(data.roomId);
+        if (this.roomIdSet.has(data.roomId)) {
             $(`#${rowId}_roomID`).html(data.roomId);
             $(`#${rowId}_roomCapacity`).html(`${data.players}/${data.capacity}`);
         } else {
-            this.roomMap.set(
-                data.roomId,
-                new Room(data.roomId, data.players, data.capacity, this, this.router),
-            );
+            this.roomIdSet.add(data.roomId);
         }
     }
 
