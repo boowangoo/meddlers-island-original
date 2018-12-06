@@ -1,8 +1,6 @@
 import $ from 'jquery';
-// import SVG from 'svgjs';
-const SVG = require('svg.js');
+import SVG from 'svg.js';
 
-import { Html } from "../../types";
 import Index from '../index';
 import Page from "../page";
 

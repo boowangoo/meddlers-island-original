@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import io from 'socket.io-client';
 
-import { Html, RoomData, ID }  from '../../types';
+import { RoomData }  from '../../shared/types';
 import Index from '../index';
 import Page from '../page';
 

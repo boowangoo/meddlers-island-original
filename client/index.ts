@@ -21,7 +21,8 @@ export default class Index {
         this.game = new Game(this);
 
         $('#globalStyle').html(globalCss.toString());
-        this.router.changePage(this.select);
+        // this.router.changePage(this.select);
+        this.router.changePage(this.game);
     }
 }
 
