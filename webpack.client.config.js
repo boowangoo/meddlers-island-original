@@ -31,6 +31,13 @@ module.exports = {
         test: /\.css$/,
         use: 'css-loader',
         exclude: /node_modules/
+      },
+      {
+        test: /\.svg$/,
+        use: {
+          loader: 'file-loader',
+          options: {}
+        }
       }
     ]
   },

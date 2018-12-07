@@ -18,11 +18,11 @@ export default class Index {
         this.router = new Router();
         this.select = new Select(this);
         this.room = new Room(this);
-        this.game = new Game(this);
+        this.game = new Game(this, 500, 500);
 
         $('#globalStyle').html(globalCss.toString());
-        // this.router.changePage(this.select);
-        this.router.changePage(this.game);
+        this.router.changePage(this.select);
+        // this.router.changePage(this.game);
     }
 }
 

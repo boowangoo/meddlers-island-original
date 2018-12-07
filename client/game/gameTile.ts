@@ -1,7 +1,7 @@
 import SVG from 'svg.js';
 import { GameTileData, PixelCoord } from '../../shared/types';
 
-import { toPixelX, toPixelY } from './gameUtils'
+import { toPixelX, toPixelY, toPixels } from './gameUtils'
 
 import desertSVG from '../res/patterns/desert.svg';
 import fieldSVG from '../res/patterns/field.svg';
@@ -11,7 +11,6 @@ import mountainSVG from '../res/patterns/mountain.svg';
 import pastureSVG from '../res/patterns/pasture.svg';
 import seaSVG from '../res/patterns/sea.svg';
 import { TileType } from '../../shared/consts';
-import { deflateRaw } from 'zlib';
 
 export default class GameTile {
     private center: PixelCoord;
@@ -20,10 +19,16 @@ export default class GameTile {
 
     constructor(draw: SVG.Container, data: GameTileData, width: number) {
         this.data = data;
-        this.center
+        this.center = toPixels(data.coord, width);
         this.tile = this.renderTile(draw, width);
-        this.setPattern(draw, data.type);
-        this.setTokenNum(draw, data.tokenNum);
+
+        console.log(draw);
+
+        this.setPattern(draw, data.type, width);
+        if (data.tokenNum) {
+            this.setTokenNum(draw, data.tokenNum, width);
+        }
+
     }
 
     private renderTile(draw: SVG.Container, width: number): SVG.Polygon {
@@ -47,37 +52,43 @@ export default class GameTile {
     }
 
     private setPattern(
-            draw: SVG.Container, type: TileType, tileSize?: number): void {
-        const tSize: number = tileSize ? tileSize : 50;
+            draw: SVG.Container, type: TileType, width: number): void {
 
         let svg: any = null;
 
         switch (type) {
             case TileType.DESERT:
                 svg = desertSVG;
+                break;
             case TileType.FIELD:
                 svg = fieldSVG;
+                break;
             case TileType.FOREST:
                 svg = forestSVG;
+                break;
             case TileType.HILL:
                 svg = hillSVG;
+                break;
             case TileType.MOUNTAIN:
                 svg = mountainSVG;
+                break;
             case TileType.PASTURE:
                 svg = pastureSVG;
+                break;
             case TileType.SEA:
                 svg = seaSVG;
+                break;
         }
 
-        let pattern: svgjs.Pattern = draw.pattern(tSize, tSize,
+        let pattern: svgjs.Pattern = draw.pattern(width, width,
                 (add: SVG.Pattern) => {
-                    add.image(svg).size(tSize, tSize);
+                    add.image(svg).size(width, width);
                 });
         this.tile.fill(pattern);
     }
 
-    private setTokenNum(draw: svgjs.Container, tokenNum: Number): void {
-        draw.circle(30).center(this.center.x, this.center.y).fill('#fff');
+    private setTokenNum(draw: svgjs.Container, tokenNum: number, width: number): void {
+        draw.circle(0.4 * width).center(this.center.x, this.center.y).fill('#fff');
         draw.text(tokenNum.toString()).center(this.center.x, this.center.y);
     }
 }

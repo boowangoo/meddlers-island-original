@@ -46,7 +46,7 @@ export default class Select implements Page {
             $('#roomIdInput').val('');
             
             this.socket.emit('updateAllInfo', (data: Array<RoomData>) => {
-                data.map((d: RoomData) => { this.updateInfo(d); });
+                data.forEach((d: RoomData) => { this.updateInfo(d); });
             });
         });
     }

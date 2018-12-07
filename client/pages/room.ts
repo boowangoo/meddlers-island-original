@@ -60,10 +60,11 @@ export default class Room implements Page {
         });
 
         this.socket.on('kicked', () => {
-            this.delete(this.index.select);
+            this.index.router.changePage(this.index.select);
         });
         
         this.socket.on('startGame', () => {
+            this.index.game.setData(this.roomId, this.players);
             this.leaveRoom(this.index.game);
         });
 
@@ -76,10 +77,6 @@ export default class Room implements Page {
 
     public leaveRoom(page: Page): void {
         this.socket.emit('leaveRoom', this.roomId);
-        this.delete(page);
-    }
-
-    public delete(page: Page): void {
         this.index.router.changePage(page);
     }
 

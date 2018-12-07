@@ -9,7 +9,7 @@ export interface RoomData {
 export interface GameTileData {
     type: TileType;
     coord: BoardCoord;
-    tokenNum: number;
+    tokenNum?: number;
     robbed: boolean;
 }
 

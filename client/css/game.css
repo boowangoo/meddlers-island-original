@@ -1,13 +1,16 @@
 #gameBoard {
     grid-area: board;
+    background-color: red;
 }
 
 #gameLog {
     grid-area: log;
+    background-color: blue;
 }
 
 #gamePlayerInfo {
     grid-area: info;
+    background-color: green;
 }
 
 #gameGridHolder {
