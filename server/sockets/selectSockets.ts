@@ -1,6 +1,6 @@
 import socketIO from 'socket.io'
 import RoomInfo from '../room/roomInfo';
-import { ID, RoomData } from '../../types';
+import { RoomData } from '../../shared/types';
 import { SocketConnection } from '../socketSetup';
 
 export default class SelectSockets {

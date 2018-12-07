@@ -20,19 +20,37 @@ class Coord {
     constructor(y: number, x: number) {
         this.y = y;
         this.x = x;
-    }    
-};    
+    }
 
-export class BoardCoord extends Coord {
+    protected add(y: number, x: number): Coord {
+        return new PixelCoord(this.y + y, this.x + x);
+    }
+
+    protected addCoord(coord: Coord): Coord {
+        return this.add(coord.y, coord.x);
+    }
+};
+
+export class PixelCoord extends Coord{
     constructor(y: number, x: number) {
         super(y, x);
-    }    
-};    
+    }
+    public add(y: number, x: number): PixelCoord {
+        return <PixelCoord>super.add(y, x);
+    }
+    public addCoord(coord: PixelCoord): PixelCoord {
+        return <PixelCoord>super.addCoord(coord);
+    }
+};
 
-export class PixelCoord extends Coord {
+export class BoardCoord extends Coord{
     constructor(y: number, x: number) {
         super(y, x);
-    }    
-};    
-
-
+    }
+    public add(y: number, x: number): BoardCoord {
+        return <BoardCoord>super.add(y, x);
+    }
+    public addCoord(coord: BoardCoord): BoardCoord {
+        return <BoardCoord>super.addCoord(coord);
+    }
+};

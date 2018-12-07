@@ -11,3 +11,13 @@ declare module '*css' {
     const content: Css;
     export default content;
 }
+
+declare module '*.json' {
+    const content: any;
+    export default content;
+}
+
+declare module "*.svg" {
+    const content: any;
+    export default content;
+}

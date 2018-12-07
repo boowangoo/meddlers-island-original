@@ -1,5 +1,5 @@
 import socketIO from 'socket.io'
-import { ID, RoomData } from '../../types';
+import { RoomData } from '../../shared/types';
 import RoomDB from '../room/roomDB';
 import SelectSockets from './selectSockets';
 import RoomInfo from '../room/roomInfo';
