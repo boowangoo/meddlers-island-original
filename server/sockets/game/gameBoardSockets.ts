@@ -17,29 +17,37 @@ export default class GameBoardSockets {
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
             socket.on('getTileData', (gameId: ID, size: BoardSize, callback: Function) => {
                 let tileData: Array<GameTileData> = null;
-                if (game.db.gameBoardMap.has(gameId)) {
-                    tileData = game.db.gameBoardMap.get(gameId);
-                } else {
+                if (!game.db.gameBoardMap.has(gameId)) {
                     tileData = this.genTileData(gameId, size);
+                    game.db.gameBoardMap.set(gameId, tileData);
+                    this.gameNsp.in(gameId).emit('initBoard', tileData);
                 }
-
-                console.log('tileData.length', tileData.length);
-
-                let cnt = 1;
-                for (let i = 0; i < tileData.length; i += 10) {
-                    let next = i + 10 - 1;
-                    if (!(next < tileData.length)) {
-                        next = tileData.length 
-                    }
-                    this.gameNsp.in(gameId).emit('returnTileData', cnt++, tileData.slice(i, next));
-                }
-            })
-
-            socket.on('disconnect', () => {
-                console.log('disconnect shit');
-
             });
+
         });
+    }
+
+    // Fisher-Yates Shuffle
+    private shuffle<T>(arr: Array<T>): Array<T>{
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    private tileTypeScramble(size: BoardSize): Array<TileType> {
+        const typeArr: Array<TileType> = [];
+        const tileCnt = boardTemplates[BoardSize[size]]['TILECNT'];
+
+        Object.keys(tileCnt).forEach((k: string) => {
+            for (let i = 0; i < tileCnt[k]; i++) {
+                const key = k as keyof typeof TileType
+                typeArr.push(TileType[key]);
+            }
+        });
+
+        return this.shuffle(typeArr);
     }
 
     private genTileData(gameId: ID, size: BoardSize): Array<GameTileData> {
@@ -47,7 +55,6 @@ export default class GameBoardSockets {
 
         const boardTempl = boardTemplates[BoardSize[size]];
         const tokens = boardTemplates[BoardSize[size]]['TOKENNUMS'];
-        const tileCnt = boardTempl['TILECNT'];
         const seaTiles = boardTempl['SEA'];
         const landTiles = boardTempl['LAND'];
 
@@ -59,20 +66,17 @@ export default class GameBoardSockets {
             });
         });
 
-        const keys = Object.keys(tileCnt);
-        let selectedType: string;
+        let selectedType: TileType;
+        const tileTypeScrambled: Array<TileType> = this.tileTypeScramble(size);
         let t: number = 0;
-        landTiles.forEach((land: BoardCoord) => {
-            do {
-                selectedType = keys[keys.length * Math.random() | 0];
-            }
-            while (tileCnt[selectedType] < 1);
 
-            const stype = selectedType as keyof typeof TileType;
+        landTiles.forEach((land: BoardCoord) => {
+            selectedType = tileTypeScrambled.pop();
+
             const tempData: GameTileData = {
-                type: TileType[stype],
+                type: selectedType,
                 coord: land,
-                robbed: selectedType === 'DESERT'
+                robbed: selectedType === TileType.DESERT,
             };
 
             if (tempData.type !== TileType.DESERT) {
@@ -80,8 +84,6 @@ export default class GameBoardSockets {
             }
             
             data.push(tempData);
-
-            tileCnt[selectedType]--;
         });
 
         return data;

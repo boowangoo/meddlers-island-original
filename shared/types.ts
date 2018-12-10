@@ -1,5 +1,10 @@
 import { TileType } from "./consts";
 
+export interface GameLogData {
+    from?: string;
+    msg: string;
+}
+
 export interface RoomData {
     roomId: ID;
     players: number;

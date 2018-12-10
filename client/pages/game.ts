@@ -9,6 +9,8 @@ import gameHtml from '../html/game.html';
 import gameCss from '../css/game.css';
 import GameBoard from '../game/gameBoard';
 import { BoardSize } from '../../shared/consts';
+import GameLog from '../game/gameLog';
+import GameInfo from '../game/gameInfo';
 
 export default class Game implements Page {
     private index: Index;
@@ -17,16 +19,18 @@ export default class Game implements Page {
     private gameBoard: GameBoard;
     private width: number;
     private height: number;
+    private gameLog: GameLog;
+    private gameInfo: GameInfo;
 
     private _gameId: ID;
     private _players: number;
 
     constructor(index: Index, width: number, height: number) {
         this.gameBoard = null;
-
+        
         this.index = index;
         this.socket = io('/game');
-
+        
         this.width = width;
         this.height = height;
     }
@@ -35,11 +39,15 @@ export default class Game implements Page {
         this._gameId = gameId;
         this._players = players;
     }
-
+    
     public init(): void {
+        this.gameLog = new GameLog(this.gameId, this.socket);
+        this.gameInfo = new GameInfo(this.gameId, this.socket);
+
         this.socket.emit('joinGame', this.gameId, this.players);
 
         this.socket.on('startGameplay', (size: BoardSize) => {
+            if (this.gameBoard) { return; }
             this.gameBoard = new GameBoard(
                 this.gameId,
                 this.socket,

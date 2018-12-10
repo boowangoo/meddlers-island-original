@@ -22,8 +22,6 @@ export default class GameTile {
         this.center = toPixels(data.coord, width);
         this.tile = this.renderTile(draw, width);
 
-        console.log(draw);
-
         this.setPattern(draw, data.type, width);
         if (data.tokenNum) {
             this.setTokenNum(draw, data.tokenNum, width);

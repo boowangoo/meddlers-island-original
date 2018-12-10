@@ -29,10 +29,12 @@ export default class Select implements Page {
         });
         
         $(document).ready(() => {
-            $('#createRoom').click(() => {
+            $('#createRoomForm').submit((e) => {
+                e.preventDefault(); // stops page from reloading
+
                 $('#createRoomStatus').html('');
                 const roomId = (<string>$('#roomIdInput').val())
-                .replace(/\s/g, '_');
+                        .replace(/\s/g, '_');
 
                 this.socket.emit('createRoom', roomId, (data: RoomData) => {
                     if (data) {
@@ -41,9 +43,10 @@ export default class Select implements Page {
                         $('#createRoomStatus').html('room not created');
                     }
                 });
+                
+                $('#roomIdInput').val('');
             });
             
-            $('#roomIdInput').val('');
             
             this.socket.emit('updateAllInfo', (data: Array<RoomData>) => {
                 data.forEach((d: RoomData) => { this.updateInfo(d); });

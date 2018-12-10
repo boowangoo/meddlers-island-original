@@ -1,21 +1,55 @@
 #gameBoard {
     grid-area: board;
-    background-color: red;
+    background-color: #FF9999;
 }
 
 #gameLog {
     grid-area: log;
-    background-color: blue;
+    background-color: #9999FF;
 }
 
-#gamePlayerInfo {
+#gameInfo {
     grid-area: info;
-    background-color: green;
+    background-color: #99FF99;
 }
 
 #gameGridHolder {
     display: grid;
     grid-template-areas:
         "board info"
-        "log info"
+        "log info";
+    grid-template-columns: 500px auto;
+    grid-template-rows: 500px auto;
+}
+
+#gameLogForm {
+    margin: 0;
+    padding: 3px;
+    box-sizing: border-box;
+    width: 100%; 
+}
+#gameLogForm input {
+    border: 0;
+    width: 80%;
+}
+#gameLogForm button {
+    width: 18%;
+}
+#gameLogMsgs {
+    padding: 0;
+    margin: 0;
+    height: 100px;
+    overflow-y: scroll;
+}
+#gameLogMsgs ul {
+    padding: 3px;
+    margin: 0;
+    box-sizing: border-box;
+    list-style-type: none;
+}
+#gameLogMsgs ul li:nth-child(even) {
+    background: #eee;
+}
+#gameLogMsgs ul li:nth-child(odd) {
+    background: #bbb;
 }

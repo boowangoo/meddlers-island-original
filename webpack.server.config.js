@@ -19,6 +19,7 @@ module.exports = {
   },
   mode: 'development',
   resolve: { extensions: ['.ts', '.js'] },
+  devtool: 'inline-source-map',
   externals: [nodeExternals()],
   module: {
     rules: [
