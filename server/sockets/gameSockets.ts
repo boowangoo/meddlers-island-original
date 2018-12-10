@@ -2,6 +2,8 @@ import socketIO from 'socket.io'
 import { SocketConnection } from '../socketSetup';
 import GameBoardSockets from './game/gameBoardSockets';
 import GameDB from '../game/gameDB';
+import { join } from 'path';
+import { BoardSize } from '../../shared/consts';
 
 export default class GameSockets {
     private conn: SocketConnection;
@@ -18,9 +20,14 @@ export default class GameSockets {
         this.gameBoardSockets = new GameBoardSockets(this, nsp);
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
-            socket.on('joinGame', (gameId: ID) => {
-                console.log(socket.id + ' has joined game ' + gameId);
+            socket.on('joinGame', (gameId: ID, players: number) => {
                 socket.join(gameId);
+                const joinedPlayers = this.gameNsp.adapter.rooms[gameId].length;
+                if (joinedPlayers === players) {
+                    if (joinedPlayers === 3 || joinedPlayers === 4) {
+                        this.gameNsp.in(gameId).emit('startGameplay', BoardSize.SMALL);
+                    }
+                }
             });
 
             socket.on('disconnect', () => {

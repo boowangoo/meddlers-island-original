@@ -31,24 +31,22 @@ export default class Game implements Page {
         this.height = height;
     }
 
-    public init(): void {
-        this.socket.emit('joinGame', this.gameId);
+    public setData(gameId: ID, players: number): void {
+        this._gameId = gameId;
+        this._players = players;
+    }
 
-        this.socket.on('startGameplay', () => {
+    public init(): void {
+        this.socket.emit('joinGame', this.gameId, this.players);
+
+        this.socket.on('startGameplay', (size: BoardSize) => {
             this.gameBoard = new GameBoard(
                 this.gameId,
                 this.socket,
                 SVG('drawing').size(this.width, this.height),
-                this.width, this.height,
-                BoardSize.SMALL,
+                this.width, this.height, size,
             );
         });
-
-    }
-
-    public setData(gameId: ID, players: number): void {
-        this._gameId = gameId;
-        this._players = players;
     }
 
     public setStylesheet(): void {

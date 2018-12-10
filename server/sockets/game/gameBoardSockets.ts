@@ -15,15 +15,28 @@ export default class GameBoardSockets {
         this.gameNsp = nsp;
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
-            socket.on('getTileData', (gameId: ID, callback: Function) => {
+            socket.on('getTileData', (gameId: ID, size: BoardSize, callback: Function) => {
+                let tileData: Array<GameTileData> = null;
                 if (game.db.gameBoardMap.has(gameId)) {
-                    callback(game.db.gameBoardMap.get(gameId));
+                    tileData = game.db.gameBoardMap.get(gameId);
                 } else {
-                    callback(this.genTileData(gameId, BoardSize.SMALL));
+                    tileData = this.genTileData(gameId, size);
                 }
-            });
+
+                console.log('tileData.length', tileData.length);
+
+                let cnt = 1;
+                for (let i = 0; i < tileData.length; i += 10) {
+                    let next = i + 10 - 1;
+                    if (!(next < tileData.length)) {
+                        next = tileData.length 
+                    }
+                    this.gameNsp.in(gameId).emit('returnTileData', cnt++, tileData.slice(i, next));
+                }
+            })
 
             socket.on('disconnect', () => {
+                console.log('disconnect shit');
 
             });
         });
