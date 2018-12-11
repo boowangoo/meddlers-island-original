@@ -27,6 +27,11 @@ export default class GameTile {
             this.setTokenNum(draw, data.tokenNum, width);
         }
 
+        // this.shiftTile(100, 100);
+    }
+
+    private shiftTile(shiftX: number, shiftY: number): void {
+        this.tile.dmove(shiftX, shiftY);
     }
 
     private renderTile(draw: SVG.Container, width: number): SVG.Polygon {
@@ -49,9 +54,8 @@ export default class GameTile {
         return hex;
     }
 
-    private setPattern(
-            draw: SVG.Container, type: TileType, width: number): void {
-
+    private setPattern(draw: SVG.Container, type: TileType,
+            width: number): void {
         let svg: any = null;
 
         switch (type) {

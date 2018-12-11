@@ -1,4 +1,4 @@
-import { TileType } from "./consts";
+import { TileType, ResourceType, DevCardType, PortType, PropertyType } from "./consts";
 
 export interface GameLogData {
     from?: string;
@@ -16,6 +16,23 @@ export interface GameTileData {
     coord: BoardCoord;
     tokenNum?: number;
     robbed: boolean;
+}
+
+export interface PlayerData {
+    gameId: ID;
+    alias: ID;
+
+    vicPts: number;
+    longRd: number;
+    armySize: number;
+}
+
+export interface FullPlayerData extends PlayerData{
+    isFull: true;
+    resources: Map<ResourceType, number>;
+    properties: Map<PropertyType, number>;
+    devCards: Map<DevCardType, number>;
+    ports: Map<PortType, number>;
 }
 
 class Coord {

@@ -1,11 +1,11 @@
 import { PixelCoord, BoardCoord } from "../../shared/types";
 
 export function toPixelX(boardX: number,  width: number): number {
-    return boardX * width / 2;
+    return (boardX) * width / 2;
 }      
 
 export function toPixelY(boardY: number,  width: number): number {
-    return boardY * width / 2 / Math.sqrt(3);
+    return (boardY) * width / 2 / Math.sqrt(3);
 }      
 
 export function toPixels(boardCoord: BoardCoord, width: number): PixelCoord {

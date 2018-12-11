@@ -54,6 +54,7 @@ export default class Game implements Page {
                 SVG('drawing').size(this.width, this.height),
                 this.width, this.height, size,
             );
+            this.gameInfo.updateAllPlayerInfo();
         });
     }
 
