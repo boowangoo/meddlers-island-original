@@ -18,6 +18,12 @@ export interface GameTileData {
     robbed: boolean;
 }
 
+export interface GamePortData {
+    type: PortType;
+    a: BoardCoord;
+    b: BoardCoord;
+}
+
 export interface PlayerData {
     gameId: ID;
     alias: ID;
@@ -45,7 +51,7 @@ class Coord {
     }
 
     protected add(y: number, x: number): Coord {
-        return new PixelCoord(this.y + y, this.x + x);
+        return new Coord(this.y + y, this.x + x);
     }
 
     protected addCoord(coord: Coord): Coord {

@@ -1,8 +1,8 @@
 import socketIO from 'socket.io';
 
 import GameSockets from "../gameSockets";
-import { GameTileData, BoardCoord } from '../../../shared/types';
-import { BoardSize, TileType } from '../../../shared/consts';
+import { GameTileData, BoardCoord, GamePortData } from '../../../shared/types';
+import { BoardSize, TileType, PortType } from '../../../shared/consts';
 
 import boardTemplates from '../../res/boardTemplates.json';
 
@@ -15,15 +15,30 @@ export default class GameBoardSockets {
         this.gameNsp = nsp;
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
-            socket.on('getTileData', (gameId: ID, size: BoardSize, callback: Function) => {
+            socket.on('getBoardData', (gameId: ID, size: BoardSize) => {
+                let tilesGenerated: boolean = false;
+                let portsGenerated: boolean = false;
+                
                 let tileData: Array<GameTileData> = null;
-                if (!game.db.gameBoardMap.has(gameId)) {
-                    tileData = this.genTileData(gameId, size);
-                    game.db.gameBoardMap.set(gameId, tileData);
-                    this.gameNsp.in(gameId).emit('initBoard', tileData);
+                let portData: Array<GamePortData> = null;
+
+                if (!game.db.gameTilesMap.has(gameId)) {
+                    tileData = this.genTileData(size);
+                    game.db.gameTilesMap.set(gameId, tileData);
+                    this.gameNsp.in(gameId).emit('initTiles', tileData);
+                    tilesGenerated = true;
+                }
+                
+                if (!game.db.gamePortsMap.has(gameId)) {
+                    portData = this.genPortData(size);
+                    game.db.gamePortsMap.set(gameId, portData);
+                    portsGenerated = true;
+                }
+
+                if (tilesGenerated && portsGenerated) {
+                    this.gameNsp.in(gameId).emit('initBoard', tileData, portData);
                 }
             });
-
         });
     }
 
@@ -34,6 +49,24 @@ export default class GameBoardSockets {
             [arr[i], arr[j]] = [arr[j], arr[i]];
         }
         return arr;
+    }
+
+    private genPortData(size: BoardSize): Array<GamePortData> {
+        let ports: Array<GamePortData> =
+        this.shuffle(boardTemplates[BoardSize[size]]['PORT']);
+
+        const types: Array<PortType> = [PortType.BRICK, PortType.GRAIN,
+                PortType.LUMBER, PortType.ORE, PortType.WOOL];
+        if (size === BoardSize.LARGE) { types.push(PortType.WOOL); }
+
+        return ports.map((port: any) => {
+            const gpd: GamePortData = {
+                type: types.pop() || PortType.ANY,
+                a: new BoardCoord(port.a.y, port.a.x),
+                b: new BoardCoord(port.b.y, port.b.x),
+            };
+            return gpd;
+        });
     }
 
     private tileTypeScramble(size: BoardSize): Array<TileType> {
@@ -50,11 +83,11 @@ export default class GameBoardSockets {
         return this.shuffle(typeArr);
     }
 
-    private genTileData(gameId: ID, size: BoardSize): Array<GameTileData> {
+    private genTileData(size: BoardSize): Array<GameTileData> {
         const data: Array<GameTileData> = [];
 
         const boardTempl = boardTemplates[BoardSize[size]];
-        const tokens = boardTemplates[BoardSize[size]]['TOKENNUMS'];
+        const tokens = boardTempl['TOKENNUMS'];
         const seaTiles = boardTempl['SEA'];
         const landTiles = boardTempl['LAND'];
 

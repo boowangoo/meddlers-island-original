@@ -1,7 +1,8 @@
 import SVG from 'svg.js';
-import { GameTileData, PixelCoord } from '../../shared/types';
 
 import { toPixelX, toPixelY, toPixels } from './gameUtils'
+import { GameTileData, PixelCoord } from '../../shared/types';
+import { TileType } from '../../shared/consts';
 
 import desertSVG from '../res/patterns/desert.svg';
 import fieldSVG from '../res/patterns/field.svg';
@@ -10,31 +11,25 @@ import hillSVG from '../res/patterns/hill.svg';
 import mountainSVG from '../res/patterns/mountain.svg';
 import pastureSVG from '../res/patterns/pasture.svg';
 import seaSVG from '../res/patterns/sea.svg';
-import { TileType } from '../../shared/consts';
 
 export default class GameTile {
     private center: PixelCoord;
     private data: GameTileData;
-    private tile: SVG.Polygon;
+    private tile: SVG.Nested;
 
-    constructor(draw: SVG.Container, data: GameTileData, width: number) {
+    constructor(board: SVG.Nested, data: GameTileData, width: number) {
         this.data = data;
         this.center = toPixels(data.coord, width);
-        this.tile = this.renderTile(draw, width);
+        this.tile = board.nested();
 
-        this.setPattern(draw, data.type, width);
+        const hex = this.renderTile(width);
+        
         if (data.tokenNum) {
-            this.setTokenNum(draw, data.tokenNum, width);
+            this.setTokenNum(data.tokenNum, width);
         }
-
-        // this.shiftTile(100, 100);
     }
 
-    private shiftTile(shiftX: number, shiftY: number): void {
-        this.tile.dmove(shiftX, shiftY);
-    }
-
-    private renderTile(draw: SVG.Container, width: number): SVG.Polygon {
+    private renderTile(width: number): SVG.Polygon {
         const cx: number = this.center.x;
         const cy: number = this.center.y;
         const unitX: number = toPixelX(1, width);
@@ -49,13 +44,13 @@ export default class GameTile {
             cx - unitX, cy + unitY
         ];
 
-        let hex: SVG.Polygon = draw.polygon(path).fill('#f00');
+        let hex: SVG.Polygon = this.tile.polygon(path)
+                .fill(this.setPattern(this.data.type, width));
         
         return hex;
     }
 
-    private setPattern(draw: SVG.Container, type: TileType,
-            width: number): void {
+    private setPattern(type: TileType, width: number): SVG.Pattern {
         let svg: any = null;
 
         switch (type) {
@@ -82,15 +77,13 @@ export default class GameTile {
                 break;
         }
 
-        let pattern: svgjs.Pattern = draw.pattern(width, width,
-                (add: SVG.Pattern) => {
-                    add.image(svg).size(width, width);
-                });
-        this.tile.fill(pattern);
+        return this.tile.pattern(width, width, (add: SVG.Pattern) => {
+            add.image(svg).size(width, width);
+        });
     }
 
-    private setTokenNum(draw: svgjs.Container, tokenNum: number, width: number): void {
-        draw.circle(0.4 * width).center(this.center.x, this.center.y).fill('#fff');
-        draw.text(tokenNum.toString()).center(this.center.x, this.center.y);
+    private setTokenNum(tokenNum: number, width: number): void {
+        this.tile.circle(0.4 * width).center(this.center.x, this.center.y).fill('#fff');
+        this.tile.text(tokenNum.toString()).center(this.center.x, this.center.y);
     }
 }
