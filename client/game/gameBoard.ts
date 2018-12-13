@@ -1,11 +1,12 @@
 import SVG from 'svg.js';
-import http from 'http';
 
 import { BoardCoord, GameTileData, GamePortData } from '../../shared/types';
-import GameTile from './gameTile';
 import { BoardSize } from '../../shared/consts';
-import GamePort from './gamePort';
 import { toPixelX, toPixelY } from './gameUtils';
+import GameTile from './gameTile';
+import GamePort from './gamePort';
+
+import nodesAndPaths from '../res/nodesAndPaths.json';
 
 export default class GameBoard {
     socket: SocketIOClient.Socket
@@ -14,7 +15,7 @@ export default class GameBoard {
     private draw: SVG.Container;
     private board: SVG.Nested;
     private tileMap: Map<BoardCoord, GameTile>;
-    private portMap: Map<BoardCoord, Array<GamePort>>;
+    private portMap: Map<BoardCoord, GamePort>;
     private size: BoardSize;
 
     private tileLoaded: boolean;
@@ -28,7 +29,7 @@ export default class GameBoard {
         this.gameId = gameId;
         this.size = size;
         this.tileMap = new Map<BoardCoord, GameTile>();
-        this.portMap = new Map<BoardCoord, Array<GamePort>>();
+        this.portMap = new Map<BoardCoord, GamePort>();
 
         this.tileLoaded = false;
         this.portLoaded = false;
@@ -41,10 +42,7 @@ export default class GameBoard {
                 tiles.forEach((gtd: GameTileData) => {
                     const gt: GameTile = new GameTile(
                             this.board, gtd, tileWidth);
-                    
-                    if (!this.tileMap.has(gtd.coord)) {
-                        this.tileMap.set(gtd.coord, gt);
-                    }
+                    this.tileMap.set(gtd.coord, gt);
                 });
                 this.tileLoaded = true;
             }
@@ -52,25 +50,30 @@ export default class GameBoard {
             if (!this.portLoaded) {
                 ports.forEach((gpd: GamePortData) => {
                     const gp = new GamePort(this.board, gpd, tileWidth);
-                    [gpd.a, gpd.b].forEach((coord: BoardCoord) => {
-                        if (!this.portMap.has(coord)) {
-                            this.portMap.set(coord, []);
-                        }
-                        this.portMap.get(coord).push(gp);
-                    });
+                    this.portMap.set(gpd.a, gp);
+                    this.portMap.set(gpd.b, gp);
                 });
                 this.portLoaded = true;
             }
 
-            // this.board.dmove(100, 100);
-            for (let i = 0; i < 15; i++) {
-                for (let j = 0; j < 25; j++) {
-                    this.board.circle(tileWidth / 12).center(
-                        toPixelX(i, tileWidth),
-                        toPixelY(j, tileWidth),
-                    );
-                }
-            }
+            const nodes = nodesAndPaths[BoardSize[size]]['NODES'];
+            const paths = nodesAndPaths[BoardSize[size]]['PATHS'];
+
+            nodes.forEach((node: any) => {
+                this.board.circle(tileWidth / 4).center(
+                    toPixelX(node.x, tileWidth),
+                    toPixelY(node.y, tileWidth),
+                );
+            });
+
+            paths.forEach((path: any) => {
+                this.board.line(
+                    toPixelX(path.a.x, tileWidth),
+                    toPixelY(path.a.y, tileWidth),
+                    toPixelX(path.b.x, tileWidth),
+                    toPixelY(path.b.y, tileWidth)
+                ).stroke({ width: tileWidth / 8 });
+            });
         });
 
         this.socket.emit('getBoardData', gameId, size);

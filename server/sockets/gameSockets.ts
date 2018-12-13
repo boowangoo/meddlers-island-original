@@ -7,33 +7,37 @@ import { BoardSize } from '../../shared/consts';
 import GameLogSockets from './game/gameLogSockets';
 import GameInfo from '../game/gameInfo';
 import { PlayerData } from '../../shared/types';
+import GameSM from '../game/gameSM';
 
 export default class GameSockets {
     private conn: SocketConnection;
     private gameNsp: socketIO.Namespace;
     
     public db: GameDB;
+    public sm: GameSM;
     public gameBoardSockets: GameBoardSockets;
-    public gameLog: GameLogSockets;
+    public gameLogSockets: GameLogSockets;
 
     constructor(nsp: socketIO.Namespace, conn: SocketConnection) {
         this.conn = conn;
         this.gameNsp = nsp;
 
         this.db = new GameDB();
-        this.gameLog = new GameLogSockets(this, nsp);
+        this.sm = new GameSM(this.db);
+        this.gameLogSockets = new GameLogSockets(this, nsp);
         this.gameBoardSockets = new GameBoardSockets(this, nsp);
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
             socket.on('joinGame', (gameId: ID, players: number) => {
                 socket.join(gameId);
                 const joinedPlayers = this.gameNsp.adapter.rooms[gameId].length;
+                this.addGameInfo(gameId, socket);
                 if (joinedPlayers === players) {
                     if (joinedPlayers === 3 || joinedPlayers === 4) {
                         this.gameNsp.in(gameId).emit('startGameplay', BoardSize.SMALL);
+                        // this.sm.start(gameId: ID);
                     }
                 }
-                this.addGameInfo(gameId, socket);
             });
 
             socket.on('updateAllPlayerInfo', (gameId: ID, callback: Function) => {
