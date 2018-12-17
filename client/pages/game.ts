@@ -11,6 +11,7 @@ import GameBoard from '../game/gameBoard';
 import { BoardSize } from '../../shared/consts';
 import GameLog from '../game/gameLog';
 import GameInfo from '../game/gameInfo';
+import GameTurns from '../game/gameTurns';
 
 export default class Game implements Page {
     private index: Index;
@@ -21,6 +22,7 @@ export default class Game implements Page {
     private height: number;
     private gameLog: GameLog;
     private gameInfo: GameInfo;
+    private gameTurns: GameTurns;
 
     private _gameId: ID;
     private _players: number;
@@ -43,6 +45,8 @@ export default class Game implements Page {
     public init(): void {
         this.gameLog = new GameLog(this.gameId, this.socket);
         this.gameInfo = new GameInfo(this.gameId, this.socket);
+        this.gameTurns = new GameTurns(this.gameId, this.socket);
+
 
         this.socket.emit('joinGame', this.gameId, this.players);
 
@@ -55,6 +59,8 @@ export default class Game implements Page {
                 this.width, this.height, size,
             );
             this.gameInfo.updateAllPlayerInfo();
+
+            this.gameTurns.ready();
         });
     }
 

@@ -31,13 +31,15 @@ export default class GameBoard {
         this.tileMap = new Map<BoardCoord, GameTile>();
         this.portMap = new Map<BoardCoord, GamePort>();
 
+
+
         this.tileLoaded = false;
         this.portLoaded = false;
 
         const tileWidth = Math.max(width, height) / (size === BoardSize.SMALL ? 8 : 10);
 
         this.socket.on('initBoard',
-                (tiles: Array<GameTileData>, ports: Array<GamePortData>) => {
+                (tiles: GameTileData[], ports: GamePortData[]) => {
             if (!this.tileLoaded) {
                 tiles.forEach((gtd: GameTileData) => {
                     const gt: GameTile = new GameTile(
@@ -55,25 +57,6 @@ export default class GameBoard {
                 });
                 this.portLoaded = true;
             }
-
-            const nodes = nodesAndPaths[BoardSize[size]]['NODES'];
-            const paths = nodesAndPaths[BoardSize[size]]['PATHS'];
-
-            nodes.forEach((node: any) => {
-                this.board.circle(tileWidth / 4).center(
-                    toPixelX(node.x, tileWidth),
-                    toPixelY(node.y, tileWidth),
-                );
-            });
-
-            paths.forEach((path: any) => {
-                this.board.line(
-                    toPixelX(path.a.x, tileWidth),
-                    toPixelY(path.a.y, tileWidth),
-                    toPixelX(path.b.x, tileWidth),
-                    toPixelY(path.b.y, tileWidth)
-                ).stroke({ width: tileWidth / 8 });
-            });
         });
 
         this.socket.emit('getBoardData', gameId, size);

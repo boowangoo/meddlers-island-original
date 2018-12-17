@@ -13,8 +13,9 @@ export default class GameLogSockets {
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
             socket.on('sendGameLog', (gameId: ID, msg: string) => {
-                console.log('msg of ' + gameId, msg);
-                this.sendGameLog(gameId, msg, socket.id.replace(/\/.+#/, ''));
+                const playerID = socket.id.replace(/\/.+#/, '');
+                const alias = game.db.getPlayerInfo(gameId, playerID).alias;
+                this.sendGameLog(gameId, msg, alias);
             });
         });
     }

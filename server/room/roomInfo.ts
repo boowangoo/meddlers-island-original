@@ -2,7 +2,7 @@ import { RoomData } from "../../shared/types";
 
 export default class RoomInfo {
     private _roomId: ID;
-    private _players: Array<ID>;
+    private _players: ID[];
     private _capacity: number;
 
     constructor(roomId: ID, capacity?: number) {
@@ -28,7 +28,7 @@ export default class RoomInfo {
     }
 
     public get roomId(): ID { return this._roomId; }
-    public get players(): Array<ID> { return this._players; }
+    public get players(): ID[] { return this._players; }
     public get capacity(): number { return this._capacity; }
 
     public toMsg(): RoomData {

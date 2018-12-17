@@ -19,8 +19,8 @@ export default class GameBoardSockets {
                 let tilesGenerated: boolean = false;
                 let portsGenerated: boolean = false;
                 
-                let tileData: Array<GameTileData> = null;
-                let portData: Array<GamePortData> = null;
+                let tileData: GameTileData[] = null;
+                let portData: GamePortData[] = null;
 
                 if (!game.db.gameTilesMap.has(gameId)) {
                     tileData = this.genTileData(size);
@@ -43,7 +43,7 @@ export default class GameBoardSockets {
     }
 
     // Fisher-Yates Shuffle
-    private shuffle<T>(arr: Array<T>): Array<T>{
+    private shuffle<T>(arr: T[]): T[]{
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -51,11 +51,11 @@ export default class GameBoardSockets {
         return arr;
     }
 
-    private genPortData(size: BoardSize): Array<GamePortData> {
-        let ports: Array<GamePortData> =
+    private genPortData(size: BoardSize): GamePortData[] {
+        let ports: GamePortData[] =
         this.shuffle(boardTemplates[BoardSize[size]]['PORT']);
 
-        const types: Array<PortType> = [PortType.BRICK, PortType.GRAIN,
+        const types: PortType[] = [PortType.BRICK, PortType.GRAIN,
                 PortType.LUMBER, PortType.ORE, PortType.WOOL];
         if (size === BoardSize.LARGE) { types.push(PortType.WOOL); }
 
@@ -69,8 +69,8 @@ export default class GameBoardSockets {
         });
     }
 
-    private tileTypeScramble(size: BoardSize): Array<TileType> {
-        const typeArr: Array<TileType> = [];
+    private tileTypeScramble(size: BoardSize): TileType[] {
+        const typeArr: TileType[] = [];
         const tileCnt = boardTemplates[BoardSize[size]]['TILECNT'];
 
         Object.keys(tileCnt).forEach((k: string) => {
@@ -83,8 +83,8 @@ export default class GameBoardSockets {
         return this.shuffle(typeArr);
     }
 
-    private genTileData(size: BoardSize): Array<GameTileData> {
-        const data: Array<GameTileData> = [];
+    private genTileData(size: BoardSize): GameTileData[] {
+        const data: GameTileData[] = [];
 
         const boardTempl = boardTemplates[BoardSize[size]];
         const tokens = boardTempl['TOKENNUMS'];
@@ -100,7 +100,7 @@ export default class GameBoardSockets {
         });
 
         let selectedType: TileType;
-        const tileTypeScrambled: Array<TileType> = this.tileTypeScramble(size);
+        const tileTypeScrambled: TileType[] = this.tileTypeScramble(size);
         let t: number = 0;
 
         landTiles.forEach((land: BoardCoord) => {

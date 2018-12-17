@@ -48,8 +48,8 @@ export default class SelectSockets {
             });
 
             socket.on('updateAllInfo', (callback: Function) => {
-                const keys: Array<ID> = Array.from(conn.db.roomMap.keys());
-                const data: Array<RoomData> = keys.map(
+                const keys: ID[] = Array.from(conn.db.roomMap.keys());
+                const data: RoomData[] = keys.map(
                     (roomId) => conn.db.roomMap.get(roomId).toMsg()
                 );
                 callback(data);

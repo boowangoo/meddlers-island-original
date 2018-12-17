@@ -26,8 +26,6 @@ export default class GameLog {
         $(document).ready(() => {
             $('#gameLogForm').submit((e) => {
                 e.preventDefault(); // stops page from reloading
-
-                console.log('asdfasdfasdf');
     
                 this.socket.emit('sendGameLog',
                         this.gameId, $('#gameLogInput').val());

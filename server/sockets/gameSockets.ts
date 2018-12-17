@@ -7,14 +7,12 @@ import { BoardSize } from '../../shared/consts';
 import GameLogSockets from './game/gameLogSockets';
 import GameInfo from '../game/gameInfo';
 import { PlayerData } from '../../shared/types';
-import GameSM from '../game/gameSM';
 
 export default class GameSockets {
     private conn: SocketConnection;
     private gameNsp: socketIO.Namespace;
     
     public db: GameDB;
-    public sm: GameSM;
     public gameBoardSockets: GameBoardSockets;
     public gameLogSockets: GameLogSockets;
 
@@ -23,7 +21,6 @@ export default class GameSockets {
         this.gameNsp = nsp;
 
         this.db = new GameDB();
-        this.sm = new GameSM(this.db);
         this.gameLogSockets = new GameLogSockets(this, nsp);
         this.gameBoardSockets = new GameBoardSockets(this, nsp);
 
@@ -35,14 +32,13 @@ export default class GameSockets {
                 if (joinedPlayers === players) {
                     if (joinedPlayers === 3 || joinedPlayers === 4) {
                         this.gameNsp.in(gameId).emit('startGameplay', BoardSize.SMALL);
-                        // this.sm.start(gameId: ID);
                     }
                 }
             });
 
             socket.on('updateAllPlayerInfo', (gameId: ID, callback: Function) => {
                 if (this.db.gameMap.has(gameId)) {
-                    const dataArr: Array<PlayerData> = this.db.gameMap.get(gameId)
+                    const dataArr: PlayerData[] = this.db.gameMap.get(gameId)
                             .map((info: GameInfo) => {
                         if (info.playerId === socket.id.replace(/\/.+#/, '')) {
                             return info.toMsg(true);

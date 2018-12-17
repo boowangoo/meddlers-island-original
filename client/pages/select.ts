@@ -48,7 +48,7 @@ export default class Select implements Page {
             });
             
             
-            this.socket.emit('updateAllInfo', (data: Array<RoomData>) => {
+            this.socket.emit('updateAllInfo', (data: RoomData[]) => {
                 data.forEach((d: RoomData) => { this.updateInfo(d); });
             });
         });
