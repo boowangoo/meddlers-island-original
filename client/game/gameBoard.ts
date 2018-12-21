@@ -6,7 +6,7 @@ import { toPixelX, toPixelY } from './gameUtils';
 import GameTile from './gameTile';
 import GamePort from './gamePort';
 
-import nodesAndPaths from '../res/nodesAndPaths.json';
+import HoverBoxes from './hoverbox.ts/hoverBoxes';
 
 export default class GameBoard {
     socket: SocketIOClient.Socket
@@ -16,6 +16,7 @@ export default class GameBoard {
     private board: SVG.Nested;
     private tileMap: Map<BoardCoord, GameTile>;
     private portMap: Map<BoardCoord, GamePort>;
+    private hoverBoxes: HoverBoxes;
     private size: BoardSize;
 
     private tileLoaded: boolean;
@@ -57,6 +58,8 @@ export default class GameBoard {
                 });
                 this.portLoaded = true;
             }
+
+            this.hoverBoxes = new HoverBoxes(this.board, size, tileWidth);
         });
 
         this.socket.emit('getBoardData', gameId, size);

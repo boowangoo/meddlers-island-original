@@ -26,10 +26,10 @@ export default class GamePort {
 
         this.setCentres(width);
 
-        console.log('DATA', data);
-        console.log('--- pCentre', this.pCentre);
-        console.log('--- pIconCentre', this.pIconCentre);
-        console.log('--- rotation', this.rotation);
+        // console.log('DATA', data);
+        // console.log('--- pCentre', this.pCentre);
+        // console.log('--- pIconCentre', this.pIconCentre);
+        // console.log('--- rotation', this.rotation);
 
         this.port.polygon([
             0, 0,

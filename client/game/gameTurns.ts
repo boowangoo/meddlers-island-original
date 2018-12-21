@@ -1,3 +1,5 @@
+import { id } from "./gameUtils";
+
 export default class GameTurns {
     private socket: SocketIOClient.Socket;
     private gameId: ID;
@@ -7,12 +9,13 @@ export default class GameTurns {
         this.gameId = gameId;
 
         this.socket.on('updateTurn', (turn: any) => {
-
+            console.log('id', id(socket.id));
+            console.log('turnlol', turn);
         });
 
     }
 
     public ready(): void {
-        this.socket.emit('ready', this.gameId);
+        this.socket.emit('initTurns', this.gameId);
     }
 }

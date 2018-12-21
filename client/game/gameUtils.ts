@@ -18,3 +18,7 @@ export function toPixels(boardCoord: BoardCoord, width: number): PixelCoord {
 export function toPixelYX(y: number, x: number, width: number): PixelCoord {
     return this.toPixels(new BoardCoord(y, x), width);
 }
+
+export function id(id: ID): ID {
+    return id.replace(/\/.+#/, '');
+}

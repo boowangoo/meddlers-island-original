@@ -5,6 +5,10 @@ import { GameState } from "./gameStates";
 
 export default class GameSetup {
     public static runStep(gameId: ID, db: GameDB): GameInfo {
+        if (db.gameStatesMap.get(gameId) !== GameState.SETUP) {
+            return null;
+        }
+
         const players: GameInfo[] = db.gameMap.get(gameId);
         if (!db.gameTurnsMap.has(gameId)) {
             db.gameTurnsMap.set(gameId, players[0]);

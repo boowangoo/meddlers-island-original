@@ -1,8 +1,7 @@
 import SVG from 'svg.js';
 
-import nodesAndPaths from '../res/nodesAndPaths.json';
+import nodesAndPaths from '../../res/nodesAndPaths.json';
 import { BoardSize } from '../../../shared/consts';
-import { toPixelX, toPixelY } from '../gameUtils';
 import { BoardCoord } from '../../../shared/types';
 import GameNode from './gameNode';
 import GamePath from './gamePath';
@@ -15,6 +14,9 @@ export default class HoverBoxes {
     private pathMap: Map<BoardCoord[], GamePath>;
 
     constructor(board: SVG.Nested, size: BoardSize, width: number) {
+        this.nodeMap = new Map<BoardCoord, GameNode>();
+        this.pathMap = new Map<BoardCoord[], GamePath>();
+
         const nodeCoords = nodesAndPaths[BoardSize[size]]['NODES'];
         const pathCoords = nodesAndPaths[BoardSize[size]]['PATHS'];
 
@@ -33,6 +35,10 @@ export default class HoverBoxes {
                     new GamePath(this.paths, coordA, coordB, width));
         });
 
+    }
+
+    public hidePaths(hide: boolean): void {
+        for (const asdf in this.nodeMap)
     }
 
     public getNode(coord: BoardCoord): GameNode {

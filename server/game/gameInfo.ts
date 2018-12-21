@@ -3,6 +3,7 @@ import socketIO from 'socket.io'
 import { ResourceType, PortType, DevCardType, PropertyType } from "../../shared/consts";
 import { PlayerData, FullPlayerData } from '../../shared/types';
 import { GameState } from './turns/gameStates';
+import { id } from '../../client/game/gameUtils';
 
 export default class GameInfo {
     private _gameId: ID;
@@ -17,12 +18,9 @@ export default class GameInfo {
     private _devCards: Map<DevCardType, number>;
     private _ports: Map<PortType, number>;
 
-    private _state: GameState;
-    private _turn: boolean;
-
     constructor(gameId: ID, socket: socketIO.Socket, alias: ID) {
         this._gameId = gameId;
-        this._playerId = socket.id.replace(/\/.+#/, '');
+        this._playerId = id(socket.id);
         this._alias = alias;
 
         this._vicPts = 0;
@@ -33,9 +31,6 @@ export default class GameInfo {
         this._properties = new Map<PropertyType, number>();
         this._devCards = new Map<DevCardType, number>();
         this._ports = new Map<PortType, number>();
-
-        this._state = GameState.NOT_READY;
-        this._turn = false;
     }
 
     public get gameId(): ID { return this._gameId; }
@@ -48,11 +43,6 @@ export default class GameInfo {
     public get properties(): Map<PropertyType, number> { return this._properties; }
     public get devCards(): Map<DevCardType, number> { return this._devCards; }
     public get ports(): Map<PortType, number> { return this._ports; }
-    public get state(): GameState { return this._state; }
-    public get turn(): boolean { return this._turn; }
-
-    public setState(state: GameState) { this._state = state; }
-    public setTurn(turn: boolean) { this._turn = turn; }
 
     public toMsg(full: boolean): PlayerData | FullPlayerData {
         const msg: any = {

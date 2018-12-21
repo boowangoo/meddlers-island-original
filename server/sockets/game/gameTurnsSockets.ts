@@ -2,8 +2,8 @@ import socketIO from 'socket.io';
 
 import GameSockets from "../gameSockets";
 import GameInfo from '../../game/gameInfo';
-import { GameState } from '../../game/turns/gameStates';
 import GameSetup from '../../game/turns/gameSetup';
+import { GameState } from '../../game/turns/gameStates';
 import { GameTurn } from '../../game/turns/gameTurns';
 
 export default class GameTurnsSockets {
@@ -17,28 +17,17 @@ export default class GameTurnsSockets {
         this.gameNsp = nsp;
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
-            socket.on('ready', (gameId: ID) => {
-                const playerID = socket.id.replace(/\/.+#/, '');
-                const info: GameInfo = game.db.getPlayerInfo(gameId, playerID);
-                info.setState(GameState.SETUP);
-
-                let start: boolean = true;
-                game.db.gameMap.get(gameId).forEach((info: GameInfo) => {
-                    if (info.state !== GameState.SETUP) {
-                        start = false;
-                        return;
-                    }
-                });
-
-                if (start) {
+            socket.on('initTurns', (gameId: ID) => {
+                if (game.db.gameStatesMap.get(gameId) == GameState.SETUP) {
+                    return;
+                } else if (game.db.gameStatesMap.get(gameId) == GameState.NOT_READY) {
                     game.db.gameStatesMap.set(gameId, GameState.SETUP);
                 }
+
+                GameSetup.runStep(gameId, game.db);
+
                 this.updateTurn(gameId);
             });
-            
-            socket.on('updateTurn', (gameId: ID) => {
-                this.updateTurn(gameId);
-            })
         });
     }
 

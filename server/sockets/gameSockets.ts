@@ -7,6 +7,8 @@ import { BoardSize } from '../../shared/consts';
 import GameLogSockets from './game/gameLogSockets';
 import GameInfo from '../game/gameInfo';
 import { PlayerData } from '../../shared/types';
+import GameTurnsSockets from './game/gameTurnsSockets';
+import { GameState } from '../game/turns/gameStates';
 
 export default class GameSockets {
     private conn: SocketConnection;
@@ -15,6 +17,7 @@ export default class GameSockets {
     public db: GameDB;
     public gameBoardSockets: GameBoardSockets;
     public gameLogSockets: GameLogSockets;
+    public gameTurnsSockets: GameTurnsSockets;
 
     constructor(nsp: socketIO.Namespace, conn: SocketConnection) {
         this.conn = conn;
@@ -23,6 +26,7 @@ export default class GameSockets {
         this.db = new GameDB();
         this.gameLogSockets = new GameLogSockets(this, nsp);
         this.gameBoardSockets = new GameBoardSockets(this, nsp);
+        this.gameTurnsSockets = new GameTurnsSockets(this, nsp);
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
             socket.on('joinGame', (gameId: ID, players: number) => {
@@ -66,6 +70,9 @@ export default class GameSockets {
             this.db.gameMap.set(gameId, [
                 new GameInfo(gameId, socket, 'Player 1')
             ]);
+        }
+        if (!this.db.gameStatesMap.has(gameId)) {
+            this.db.gameStatesMap.set(gameId, GameState.NOT_READY);
         }
     }
 }
