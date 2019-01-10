@@ -16,6 +16,7 @@ export default class GameTurns {
     }
 
     public ready(): void {
-        this.socket.emit('initTurns', this.gameId);
+        // this.socket.emit('initTurns', this.gameId);
+        this.socket.emit('readyToPlay', this.gameId);
     }
 }

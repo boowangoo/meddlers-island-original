@@ -6,7 +6,7 @@ import { toPixelX, toPixelY } from './gameUtils';
 import GameTile from './gameTile';
 import GamePort from './gamePort';
 
-import HoverBoxes from './hoverbox.ts/hoverBoxes';
+import HoverBoxes from './hoverbox/hoverBoxes';
 
 export default class GameBoard {
     socket: SocketIOClient.Socket

@@ -17,7 +17,6 @@ export default class GameInfo {
     public updateAllPlayerInfo(): void {
         this.socket.emit('updateAllPlayerInfo', this.gameId,
                 (data: PlayerData[]) => {
-            console.log(data);
             data.forEach((pd: PlayerData | FullPlayerData) => {
                 const id: string = pd.alias.replace(/\s/g, '');
                 if (!$(`#${id}_info`).length) {

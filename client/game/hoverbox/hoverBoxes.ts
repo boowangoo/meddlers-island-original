@@ -37,9 +37,9 @@ export default class HoverBoxes {
 
     }
 
-    public hidePaths(hide: boolean): void {
-        for (const asdf in this.nodeMap)
-    }
+    // public hidePaths(hide: boolean): void {
+    //     for (const asdf in this.nodeMap)
+    // }
 
     public getNode(coord: BoardCoord): GameNode {
         if (this.nodeMap.has(coord)) {

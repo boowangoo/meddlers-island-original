@@ -5,6 +5,7 @@ import GameInfo from '../../game/gameInfo';
 import GameSetup from '../../game/turns/gameSetup';
 import { GameState } from '../../game/turns/gameStates';
 import { GameTurn } from '../../game/turns/gameTurns';
+import GameSM from '../../game/sm/gameSM';
 
 export default class GameTurnsSockets {
     private game: GameSockets;
@@ -12,9 +13,16 @@ export default class GameTurnsSockets {
 
     private setup: GameSetup;
 
+    private sm: GameSM;
+
+    private gameReadyIds: Set<ID>;
+
     constructor(game: GameSockets, nsp: socketIO.Namespace) {
         this.game = game;
         this.gameNsp = nsp;
+
+        this.gameReadyIds = new Set<ID>();
+        this.sm = new GameSM();
 
         this.gameNsp.on('connection', (socket: socketIO.Socket) => {
             socket.on('initTurns', (gameId: ID) => {
@@ -28,6 +36,15 @@ export default class GameTurnsSockets {
 
                 this.updateTurn(gameId);
             });
+
+            socket.on('readyToPlay', (gameId: ID) => {
+                this.gameReadyIds.add(gameId);
+                const info: GameInfo[] = this.game.db.gameMap.get(gameId);
+
+                if (this.gameReadyIds.size == info.length) {
+                    this.gameNsp.in(gameId).emit('asdf', this.sm.getState);
+                }
+            })
         });
     }
 

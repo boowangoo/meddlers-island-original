@@ -47,7 +47,6 @@ export default class Game implements Page {
         this.gameInfo = new GameInfo(this.gameId, this.socket);
         this.gameTurns = new GameTurns(this.gameId, this.socket);
 
-
         this.socket.emit('joinGame', this.gameId, this.players);
 
         this.socket.on('startGameplay', (size: BoardSize) => {
